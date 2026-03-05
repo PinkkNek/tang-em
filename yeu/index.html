@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Món quà bất ngờ dành cho em ❤️</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body {
+            height: 100vh; margin: 0; background-color: #ffe6e6; 
+            display: flex; justify-content: center; align-items: center;
+            overflow: hidden; font-family: 'Segoe UI', sans-serif;
+            touch-action: manipulation;
+        }
+        #gift-wrapper {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100;
+        }
+        .huong-dan p { font-size: 1.5rem; color: #d63031; font-weight: bold; animation: nhapNhay 1.5s infinite; }
+        #gift-image { width: 180px; transition: transform 1.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 1.5s; }
+        
+        .loi-nhan {
+            position: absolute; top: 12%; width: 95%; text-align: center;
+            color: #d63031; z-index: 80; pointer-events: none;
+            text-shadow: 2px 2px 10px rgba(255, 255, 255, 0.9);
+        }
+        .loi-nhan h1 { font-size: 2.2rem; margin: 0 0 5px 0; }
+        .loi-nhan h2 { font-size: 1.7rem; margin: 0; font-weight: bold; }
+
+        .photo-floating {
+            position: absolute; border: 5px solid white; border-bottom: 20px solid white; 
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3); z-index: 10; background-color: white; 
+            pointer-events: none; border-radius: 3px; opacity: 0;
+            will-change: transform, opacity;
+        }
+        .photo-floating img { width: 100%; height: 100%; object-fit: cover; }
+
+        @keyframes chaoticFly {
+            0% { opacity: 0; transform: translate(var(--startX), var(--startY)) rotate(0deg) scale(0.5); }
+            15% { opacity: 1; transform: translate(var(--midX1), var(--midY1)) rotate(var(--r1)) scale(1); }
+            50% { transform: translate(var(--midX2), var(--midY2)) rotate(var(--r2)) scale(1.1); }
+            85% { opacity: 1; transform: translate(var(--midX3), var(--midY3)) rotate(var(--r3)) scale(1); }
+            100% { opacity: 0; transform: translate(var(--endX), var(--endY)) rotate(var(--r4)) scale(0.8); }
+        }
+
+        .rose { position: fixed; bottom: -50px; animation: flyUp linear forwards; z-index: 5; }
+        @keyframes nhapNhay { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        @keyframes flyUp { 0% { transform: translateY(0) rotate(0deg); opacity: 1; } 100% { transform: translateY(-120vh) rotate(360deg); opacity: 0; } }
+    </style>
+</head>
+<body>
+    <audio id="nhac-nen" src="nhac.mp3" loop></audio>
+    <div id="gift-wrapper">
+        <div class="huong-dan" id="huong-dan-box"><p>Bấm vào hộp quà nhé! ❤️</p><div style="font-size: 40px; text-align: center;">⬇️</div></div>
+        <img id="gift-image" src="https://em-content.zobj.net/source/apple/354/wrapped-gift_1f381.png">
+    </div>
+    <div class="loi-nhan"><h1 id="line1"></h1><h2 id="line2"></h2></div>
+
+    <script>
+        const listSourcesAnh = ["anh1.jpg", "anh2.jpg", "anh3.jpg", "anh4.jpg", "anh5.jpg", "anh6.jpg", "anh7.jpg", "anh8.jpg", "anh9.jpg", "anh10.jpg", "anh11.jpg", "anh12.jpg"];
+        const textLine1 = "999 Bông Hồng";
+        const textLine2 = "anh yêu em TTTT";
+
+        document.getElementById('gift-wrapper').addEventListener('click', function() {
+            document.getElementById('nhac-nen').play().catch(() => {});
+            document.getElementById('huong-dan-box').style.display = 'none';
+            document.getElementById('gift-image').style.transform = 'scale(6) rotate(30deg)'; 
+            document.getElementById('gift-image').style.opacity = '0'; 
+
+            setTimeout(() => {
+                document.getElementById('gift-wrapper').style.display = 'none';
+                typeWriter("line1", textLine1, 100, () => {
+                    setTimeout(() => { typeWriter("line2", textLine2, 120, startInfinite); }, 500);
+                });
+                batDauThaHoa();
+            }, 1000); 
+        });
+
+        function typeWriter(id, text, speed, callback) {
+            let i = 0; const el = document.getElementById(id);
+            function typing() { if (i < text.length) { el.innerHTML += text.charAt(i); i++; setTimeout(typing, speed); } else if (callback) callback(); }
+            typing();
+        }
+
+        function startInfinite() {
+            fireworks();
+            setInterval(taoAnhFloating, 1300); 
+        }
+
+        function fireworks() {
+            setInterval(() => {
+                confetti({ particleCount: 30, spread: 360, origin: { x: Math.random(), y: Math.random() - 0.2 }, zIndex: 90 });
+            }, 300);
+        }
+
+        function taoAnhFloating() {
+            const div = document.createElement('div');
+            div.className = 'photo-floating';
+            const img = document.createElement('img');
+            img.src = listSourcesAnh[Math.floor(Math.random() * listSourcesAnh.length)];
+            img.onerror = () => div.remove();
+            div.appendChild(img);
+
+            const size = Math.random() * 50 + 200;
+            div.style.width = size + 'px'; div.style.height = (size * 1.2) + 'px';
+
+            // --- ÉP ẢNH XUẤT HIỆN TỪ TRÁI HOẶC TRÊN/DƯỚI BÊN TRÁI ---
+            const startX = (Math.random() * -50) - 20 + 'vw'; // Chắc chắn nằm ngoài lề trái
+            const startY = (Math.random() * 100) + 'vh';
+
+            // --- ÉP ĐIỂM GIỮA NẰM Ở NỬA TRÁI MÀN HÌNH (0 - 50vw) ---
+            div.style.setProperty('--startX', startX);
+            div.style.setProperty('--startY', startY);
+            div.style.setProperty('--midX1', Math.random() * 40 + 'vw'); 
+            div.style.setProperty('--midY1', Math.random() * 80 + 'vh');
+            div.style.setProperty('--midX2', Math.random() * 50 + 'vw');
+            div.style.setProperty('--midY2', Math.random() * 50 + 'vh');
+            div.style.setProperty('--midX3', Math.random() * 40 + 'vw');
+            div.style.setProperty('--midY3', Math.random() * 80 + 'vh');
+            
+            // Điểm kết thúc bay xa ra mọi hướng
+            div.style.setProperty('--endX', Math.random() * 150 - 50 + 'vw');
+            div.style.setProperty('--endY', Math.random() * 150 - 50 + 'vh');
+            
+            div.style.setProperty('--r1', Math.random() * 30 - 15 + 'deg');
+            div.style.setProperty('--r2', Math.random() * 60 - 30 + 'deg');
+            div.style.setProperty('--r3', Math.random() * 30 - 15 + 'deg');
+            div.style.setProperty('--r4', Math.random() * 360 + 'deg');
+
+            const dur = Math.random() * 5 + 9;
+            div.style.animation = `chaoticFly ${dur}s ease-in-out forwards`;
+            document.body.appendChild(div);
+            setTimeout(() => div.remove(), dur * 1000);
+        }
+
+        function batDauThaHoa() {
+            for (let i = 0; i < 150; i++) {
+                setTimeout(() => {
+                    const r = document.createElement('div'); r.innerHTML = '🌹'; r.className = 'rose';
+                    r.style.left = Math.random() * 100 + 'vw'; r.style.animationDuration = (Math.random() * 3 + 4) + 's';
+                    document.body.appendChild(r); setTimeout(() => r.remove(), 5000);
+                }, Math.random() * 20000);
+            }
+        }
+    </script>
+</body>
+</html>
